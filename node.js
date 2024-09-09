@@ -13,7 +13,7 @@
 // un analisis si se caen mal
 //lo que se va avivir entre ellos y el partido en primera persona claveeee
 
-
+//do 5 mentes 5 5 mentes todas piensan difrentes
 
 //lRrgo de cancha
 //LOS DOS EQUIPOS QUE JUEGAN

@@ -12,7 +12,7 @@ var ClienteSchema = Schema({
     dni: { type: String, required: false },
     genero: { type: String, required:false},
     telefono: { type: String, required: false },
-    perfil: { type: String, default: 'perfil.png', required: true},
+    perfil: { type: String, default: 'perfil.png', required: false},
     f_nacimiento: { type: String, required: false},
     createAt: {type:Date, default: Date.now, required: true},
 });

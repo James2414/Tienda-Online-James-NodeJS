@@ -1,33 +1,32 @@
 'use strict';
 
-var jwt = require('jwt-simple');
+var jwt = require('jwt-simple'); // Asegúrate de importar jwt
 var moment = require('moment');
-var secret = 'diegoararca'
+var secret = 'diegoararca';
 
 exports.auth = function(req, res, next) {
-    if (!req.headers.authorization){
-        return res.status(403).send({ message: 'no HeadersERROR'})
+    if (!req.headers.authorization) {
+        return res.status(403).send({ message: 'No token provided' });
     }
-    
-    var token = req.headers.authorization.replace(/['"]+/g, '');
-    var segment = token.split('.');
 
-    if (segment.length != 3){
-        return res.status(403).send({ message: 'Token mal formado ERROR'})
-    }else{
-        try {
-            var payload = jwt.decode(token, secret);
-           
-            if (payload.exp <= moment().unix()) {
-                return res.status(403).send({ message: 'Token expirado ERROR'})
-            }
-        } catch (error) {
-            return res.status(403).send({ message: 'Token invalido ERROR'})
-            
+    let token = req.headers.authorization.replace(/['"]+/g, '');
+    if (token.startsWith('Bearer ')) {
+        token = token.slice(7, token.length); // Eliminar el prefijo 'Bearer '
+    }
+
+    console.log('Token recibido:', token);
+
+    try {
+        var payload = jwt.decode(token, secret);
+        console.log('Payload:', payload);
+        if (payload.exp <= moment().unix()) {
+            return res.status(403).send({ message: 'Token expired' });
         }
+    } catch (error) {
+        console.error('Error al decodificar el token:', error);
+        return res.status(403).send({ message: 'Invalid token' });
     }
 
     req.user = payload;
-
     next();
-}
+};

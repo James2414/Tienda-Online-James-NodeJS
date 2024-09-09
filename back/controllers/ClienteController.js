@@ -3,7 +3,6 @@ var bcrypt = require('bcrypt-nodejs');
 var jwt = require('../helpers/jwt')
 
 
-
 const registro_cliente = async function(req, res){
     var data = req.body
     var clientes_arr = [];
@@ -181,6 +180,71 @@ const eliminar_cliente_admin = async function (req, res) {
     }
 }
 
+const obtener_cliente_guest = async function(req, res){
+    if(req.user){
+        var id = req.params['id'];
+
+        try {
+            var reg = await Cliente.findById(id)
+            res.status(200).send({data: reg});
+        }catch(error){
+            res.status(200).send({data: undefined});
+
+        }
+    }else{
+        res.status(500).send({message: 'NO access'});
+    }
+}
+
+const actualizar_perfil_cliente_guest = async function(req, res){
+    if(req.user){
+        var id = req.params['id'];
+        var data = req.body;
+
+        console.log(data.password);
+
+        if(data.password){
+            console.log('Con contraseña');
+            bcrypt.hash(data.password, null, null, async function(err, hash){
+                if(err){
+                    return res.status(500).send({message: 'Error al encriptar la contraseña'});
+                }
+
+                let reg = await Cliente.findByIdAndUpdate( id, {
+                    nombres: data.nombres,
+                    apellidos: data.apellidos,
+                    telefono: data.telefono,
+                    f_nacimiento: data.f_nacimiento,
+                    genero: data.genero,
+                    dni: data.dni,
+                    pais: data.pais,
+                    password: hash,  // Aquí ya usamos la contraseña encriptada
+                }, { new: true });  // Agrega la opción `{ new: true }` para obtener el documento actualizado
+
+                return res.status(200).send({data: reg});  // Enviamos la respuesta después de que se haya completado el hash
+            });
+        } else {
+            console.log('Sin contraseña');
+            let reg = await Cliente.findByIdAndUpdate(id, {
+                nombres: data.nombres,
+                apellidos: data.apellidos,
+                telefono: data.telefono,
+                f_nacimiento: data.f_nacimiento,
+                genero: data.genero,
+                dni: data.dni,
+                pais: data.email,
+            }, { new: true });  // Usamos `{ new: true }` para devolver el documento actualizado
+
+            return res.status(200).send({data: reg});
+        }
+
+    } else {
+        return res.status(500).send({message: 'NO access'});
+    }
+};
+
+
+
 module.exports = {
     registro_cliente,
     login_cliente,
@@ -189,5 +253,7 @@ module.exports = {
     obtener_cliente_admin,
     actualizar_cliente_admin,
     eliminar_cliente_admin,
+    obtener_cliente_guest,
+    actualizar_perfil_cliente_guest,
  
 }

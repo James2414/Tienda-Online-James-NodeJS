@@ -2,10 +2,14 @@ var express = require('express');
 var mongoose = require('mongoose');
 var bodyParser = require('body-parser');
 var port = process.env.PORT || 4201
+var cors = require('cors');
 
 
 var cliente_route = require('./routes/cliente');
-var admin_route = require('./routes/admin')
+var admin_route = require('./routes/admin');
+var producto_route = require('./routes/producto');
+var config_route = require('./routes/config');
+
 // Inicializa nuestro express
 var app = express();
 
@@ -40,11 +44,14 @@ app.use((req,res,next)=>{
 });
 // cuandos se envia una data de fron a el back hay que parsear la data
 //
+app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json({limit: '50mb',extended: true}));
 
 
 app.use('/api', cliente_route);
 app.use('/api', admin_route);
+app.use('/api', producto_route);
+app.use('/api', config_route);
 
 module.exports = app;
